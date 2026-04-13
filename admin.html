@@ -8,15 +8,14 @@
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         h1 { color: #6c5ce7; border-bottom: 2px solid #6c5ce7; padding-bottom: 10px; }
         .section { margin-bottom: 30px; padding: 20px; border: 1px solid #e1e4e8; border-radius: 10px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
         .q-card { background: #f8f9fa; border-left: 5px solid #6c5ce7; padding: 20px; margin-bottom: 15px; position: relative; border-radius: 0 8px 8px 0; }
         label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 0.9rem; }
-        input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-save { background: #27ae60; color: white; width: 100%; font-size: 1.2rem; margin-top: 20px; }
         .btn-add { background: #6c5ce7; color: white; margin-top: 10px; }
         .btn-del { background: #ff7675; color: white; position: absolute; right: 10px; top: 10px; padding: 5px 10px; font-size: 0.8rem; }
-        .row { display: flex; gap: 10px; align-items: center; }
         .group-box { background: #fcfcfc; padding: 15px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 15px; }
     </style>
 </head>
@@ -28,23 +27,17 @@
     <div class="section">
         <h3>🤖 Telegram Уведомления</h3>
         <div class="grid">
-            <div>
-                <label>API Токен бота (@BotFather)</label>
-                <input type="text" id="tg-token" placeholder="Введите токен бота">
-            </div>
-            <div>
-                <label>Твой Chat ID (@userinfobot)</label>
-                <input type="text" id="tg-chatid" placeholder="Введите ваш ID">
-            </div>
+            <div><label>API Токен</label><input type="text" id="tg-token"></div>
+            <div><label>Chat ID</label><input type="text" id="tg-chatid"></div>
         </div>
     </div>
 
     <div class="section">
-        <h3>🔗 Настройка кнопок на выходе</h3>
+        <h3>🔗 Настройка кнопок и ссылок</h3>
         <div class="group-box">
             <label>ИНТРОВЕРТ</label>
             <input type="text" id="url-intro" placeholder="Ссылка (https://...)">
-            <input type="text" id="btn-intro" placeholder="Текст на кнопке (например: Забрать PDF)">
+            <input type="text" id="btn-intro" placeholder="Текст на кнопке">
         </div>
         <div class="group-box">
             <label>АМБИВЕРТ</label>
@@ -62,7 +55,7 @@
         <h3>🎨 Оформление</h3>
         <div class="grid">
             <div><label>Фон страницы</label><input type="color" id="bg-color"></div>
-            <div><label>Основной цвет (кнопки)</label><input type="color" id="primary-color"></div>
+            <div><label>Цвет акцентов</label><input type="color" id="primary-color"></div>
             <div><label>Цвет текста</label><input type="color" id="text-color"></div>
         </div>
     </div>
@@ -73,15 +66,15 @@
         <button class="btn btn-add" onclick="addQuestion()">+ Добавить вопрос</button>
     </div>
 
-    <button class="btn btn-save" onclick="saveAll()">СОХРАНИТЬ ВСЕ НАСТРОЙКИ</button>
+    <button class="btn btn-save" onclick="saveAll()">СОХРАНИТЬ ВСЁ</button>
 </div>
 
 <script>
     const STORAGE_KEY = 'quiz_config_pro';
 
     let config = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-        settings: { primary: '#6c5ce7', bg: '#f9f9fb', text: '#2d3436' },
-        questions: [{ q: "Где ты берешь энергию?", a1: "С людьми", v1: 2, a2: "В тишине", v2: 0, a3: "В узком кругу", v3: 1 }]
+        settings: { primary: '#6c5ce7', bg: '#f9f9fb', text: '#2d3436', tgToken: '', tgChatId: '', urlIntro: '', btnIntro: '', urlAmbi: '', btnAmbi: '', urlExtra: '', btnExtra: '' },
+        questions: [{ q: "Где берешь энергию?", a1: "С людьми", v1: 2, a2: "В тишине", v2: 0, a3: "В компании", v3: 1 }]
     };
 
     function init() {
@@ -109,8 +102,14 @@
             div.innerHTML = `
                 <button class="btn btn-del" onclick="deleteQ(${i})">Удалить</button>
                 <input type="text" value="${item.q}" oninput="updateQ(${i}, 'q', this.value)">
-                <div class="row"><input type="text" value="${item.a1}" oninput="updateQ(${i}, 'a1', this.value)"><input type="number" value="${item.v1}" oninput="updateQ(${i}, 'v1', this.value)" style="width:60px"></div>
-                <div class="row"><input type="text" value="${item.a2}" oninput="updateQ(${i}, 'a2', this.value)"><input type="number" value="${item.v2}" oninput="updateQ(${i}, 'v2', this.value)" style="width:60px"></div>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" placeholder="Ответ 1" value="${item.a1}" oninput="updateQ(${i}, 'a1', this.value)">
+                    <input type="number" value="${item.v1}" oninput="updateQ(${i}, 'v1', this.value)" style="width:60px">
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" placeholder="Ответ 2" value="${item.a2}" oninput="updateQ(${i}, 'a2', this.value)">
+                    <input type="number" value="${item.v2}" oninput="updateQ(${i}, 'v2', this.value)" style="width:60px">
+                </div>
             `;
             list.appendChild(div);
         });
