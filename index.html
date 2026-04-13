@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Тест на тип личности</title>
     <style>
-        :root { --p: #6c5ce7; --bg: #f9f9fb; --t: #2d3436; }
+        :root { 
+            --p: #6c5ce7; 
+            --bg: #f9f9fb; 
+            --t: #2d3436; 
+        }
         
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
@@ -24,7 +28,7 @@
             border-radius: 30px; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.05); 
             width: 90%; 
-            max-width: 550px; /* Широкая карточка для длинного текста */
+            max-width: 550px; 
             text-align: center; 
         }
 
@@ -54,16 +58,13 @@
 
         .res-name { font-size: 2.2rem; font-weight: 800; margin: 10px 0; color: var(--p); }
         
-        /* Стиль для развернутого описания */
         .res-desc { 
             font-size: 1.1rem; 
             line-height: 1.6; 
             margin-bottom: 25px; 
             color: #444; 
-            text-align: center;
         }
 
-        /* Стиль для списка стратегий */
         .tips-container {
             text-align: left;
             background: #f8f9ff;
@@ -77,20 +78,23 @@
         .tips-list { padding-left: 20px; margin: 0; }
         .tips-list li { margin-bottom: 12px; font-size: 1rem; line-height: 1.5; color: #333; }
 
+        /* Стилизация Кнопки перехода */
         .cta-btn { 
             display: block; 
             text-decoration: none; 
-            background: var(--p); 
+            background-color: var(--p) !important; 
             color: white !important; 
-            padding: 20px; 
-            border-radius: 18px; 
+            padding: 22px; 
+            border-radius: 20px; 
             font-weight: bold; 
             font-size: 1.2rem; 
+            margin-top: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.2);
         }
 
-        .cta-btn:hover { transform: scale(1.02); opacity: 0.9; }
+        .cta-btn:hover { transform: scale(1.02); filter: brightness(1.1); }
+        
         .restart { display: inline-block; margin-top: 25px; color: #999; text-decoration: none; font-size: 0.9rem; border-bottom: 1px solid #ddd; }
     </style>
 </head>
@@ -113,17 +117,20 @@
             <ul id="res-tips" class="tips-list"></ul>
         </div>
         
-        <a href="#" id="res-link" class="cta-btn">Забрать материалы</a>
+        <a href="#" id="res-link" class="cta-btn">Получить результат</a>
+        
         <a href="#" onclick="location.reload()" class="restart">Пройти тест заново</a>
     </div>
 </div>
 
 <script>
+    // Подгрузка конфига
     const config = JSON.parse(localStorage.getItem('quiz_config_pro')) || {
         settings: { primary: '#6c5ce7', bg: '#f9f9fb', text: '#2d3436' },
-        questions: [{ q: "Где ты берешь энергию?", a1: "С людьми", v1: 2, a2: "В тишине", v2: 0, a3: "В узком кругу", v3: 1 }]
+        questions: [{ q: "Где вы берете энергию?", a1: "С людьми", v1: 2, a2: "В тишине", v2: 0, a3: "В узком кругу", v3: 1 }]
     };
 
+    // Применение цветов из админки
     document.documentElement.style.setProperty('--p', config.settings.primary);
     document.documentElement.style.setProperty('--bg', config.settings.bg);
     document.documentElement.style.setProperty('--t', config.settings.text);
@@ -165,41 +172,26 @@
         const avg = score / config.questions.length;
         let res = {};
 
-        // ЖЕСТКО ПРОПИСАННЫЕ РАЗВЕРНУТЫЕ ТЕКСТЫ
+        // Описания
         if (avg < 0.7) {
             res = { 
                 n: "Интроверт", e: "🧘‍♂️", 
-                d: "Твоя суперсила — глубина и фокус. Тебе не нужно заставлять себя быть «шоуменом», чтобы продавать. Твой путь в бизнесе — это тихая экспертность, которая вызывает искреннее доверие у клиентов.", 
-                t: [
-                    "Выстраивай продажи через смыслы и глубокие тексты (статьи, лонгриды)",
-                    "Используй автоворонки и ботов — они будут продавать, пока ты восстанавливаешь силы",
-                    "Делай ставку на качество продукта: люди придут к тебе за результатом, а не за хайпом",
-                    "Вместо шумных эфиров выбирай работу в малых группах или личное наставничество"
-                ], 
+                d: "Твоя суперсила — глубина и фокус. Тебе не нужно заставлять себя быть «шоуменом», чтобы продавать. Твой путь в бизнесе — это тихая экспертность.", 
+                t: ["Выстраивай продажи через смыслы и тексты", "Используй автоворонки и ботов", "Делай ставку на качество продукта", "Выбирай работу в малых группах"], 
                 l: config.settings.urlIntro 
             };
         } else if (avg < 1.4) {
             res = { 
                 n: "Амбиверт", e: "🌓", 
-                d: "Ты — универсальный игрок. Ты одинаково хорош и в системной работе за кадром, и в живом общении. Это редкий дар, который позволяет тебе подстраиваться под любую задачу и нишу.", 
-                t: [
-                    "Чередуй фазы: активный запуск с эфирами и периоды спокойной работы над продуктом",
-                    "Тебе идеально подходят гибридные воронки: автоматизация + твое личное включение",
-                    "Не забывай вовремя уходить в тишину — тебе нужно время наедине с собой, чтобы не выгореть",
-                    "Твоя сила в гибкости — ты понимаешь и «тихих» клиентов, и тех, кому нужен драйв"
-                ], 
+                d: "Ты — универсальный игрок. Ты одинаково хорош и в системной работе за кадром, и в живом общении. Это редкий дар гибкости.", 
+                t: ["Чередуй фазы запуска и спокойной работы", "Используй гибридные воронки", "Вовремя уходи в тишину", "Твоя сила в балансе"], 
                 l: config.settings.urlAmbi 
             };
         } else {
             res = { 
                 n: "Экстраверт", e: "🔥", 
-                d: "Ты — человек-магнит! Твоя энергия — это твой главный капитал. Люди покупают у тебя, потому что буквально заряжаются твоим драйвом, уверенностью и масштабом.", 
-                t: [
-                    "Продавай через прямые эфиры и сторис — это твой самый быстрый и легкий путь к деньгам",
-                    "Активно развивай нетворкинг и партнерства: через людей к тебе придут самые крупные чеки",
-                    "Создавай вокруг себя сообщество (клубы, чаты) — тебе важно всегда быть в центре движения",
-                    "Обязательно найми ассистента для рутины, чтобы таблички не гасили твой внутренний огонь"
-                ], 
+                d: "Ты — человек-магнит! Твоя энергия — это твой главный капитал. Люди покупают у тебя, потому что заряжаются твоим драйвом.", 
+                t: ["Продавай через прямые эфиры и сторис", "Развивай нетворкинг и партнерства", "Создавай вокруг себя сообщества", "Найми ассистента для рутины"], 
                 l: config.settings.urlExtra 
             };
         }
@@ -210,12 +202,18 @@
         document.getElementById('res-desc').innerText = res.d;
         document.getElementById('res-tips').innerHTML = res.t.map(i => `<li>${i}</li>`).join('');
         
+        // РАБОТА С КНОПКОЙ
         const linkBtn = document.getElementById('res-link');
-        if (res.l) { 
-            linkBtn.href = res.l; 
-            linkBtn.innerText = `Забрать стратегию для ${res.n}а`; 
-        } else { 
-            linkBtn.style.display = 'none'; 
+        
+        if (res.l && res.l.trim() !== "") {
+            linkBtn.href = res.l;
+            linkBtn.innerText = `Забрать стратегию для ${res.n}а`;
+            linkBtn.style.opacity = "1";
+        } else {
+            // Если ссылки нет, кнопка все равно есть, но уведомляет об ошибке
+            linkBtn.href = "#"; 
+            linkBtn.innerText = `Забрать стратегию (ссылка не задана)`;
+            linkBtn.style.opacity = "0.6";
         }
 
         sendTG(res.n, score);
