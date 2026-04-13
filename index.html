@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пройди тест на тип личности</title>
+    <style>
+        :root { --p: #6c5ce7; --bg: #f9f9fb; --t: #2d3436; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--t); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        #quiz-box { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 90%; max-width: 450px; text-align: center; }
+        .progress-bar { height: 8px; width: 100%; background: #eee; border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
+        #progress { height: 100%; background: var(--p); width: 0%; transition: 0.4s; }
+        h2 { font-size: 1.4rem; margin-bottom: 25px; line-height: 1.3; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        button.ans { padding: 16px; border: 2px solid #eee; border-radius: 14px; background: none; cursor: pointer; transition: 0.2s; font-size: 1rem; color: var(--t); font-weight: 500; }
+        button.ans:hover { border-color: var(--p); background: #f4f2ff; transform: translateY(-2px); }
+        #result-ui { display: none; }
+        .cta-btn { display: block; text-decoration: none; background: var(--p); color: white; padding: 18px; border-radius: 14px; font-weight: bold; margin: 20px 0; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        ul { text-align: left; font-size: 0.9rem; line-height: 1.6; margin: 20px 0; padding-left: 20px; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-box">
+    <div id="quiz-ui">
+        <div class="progress-bar"><div id="progress"></div></div>
+        <h2 id="q-text">Загрузка вопросов...</h2>
+        <div id="opt-list" class="options"></div>
+    </div>
+
+    <div id="result-ui">
+        <div id="res-emoji" style="font-size: 4rem; margin-bottom: 10px;"></div>
+        <h1 id="res-name" style="margin: 0;"></h1>
+        <p id="res-desc" style="font-size: 0.95rem; opacity: 0.8; margin-top: 10px;"></p>
+        <ul id="res-tips"></ul>
+        <a href="#" id="res-link" class="cta-btn">Получить стратегию</a>
+        <button onclick="location.reload()" style="background:none; border:none; color:#888; cursor:pointer; text-decoration:underline;">Пройти заново</button>
+    </div>
+</div>
+
+<script>
+    const config = JSON.parse(localStorage.getItem('quiz_config_pro')) || {
+        settings: { primary: '#6c5ce7', bg: '#f9f9fb', text: '#2d3436' },
+        questions: [{ q: "Где ты берешь энергию?", a1: "С людьми", v1: 2, a2: "В тишине", v2: 0 }]
+    };
+
+    // Применяем стили
+    document.documentElement.style.setProperty('--p', config.settings.primary);
+    document.documentElement.style.setProperty('--bg', config.settings.bg);
+    document.documentElement.style.setProperty('--t', config.settings.text);
+
+    let step = 0;
+    let score = 0;
+
+    function render() {
+        if (step >= config.questions.length) return finish();
+        const data = config.questions[step];
+        document.getElementById('q-text').innerText = data.q;
+        const list = document.getElementById('opt-list');
+        list.innerHTML = '';
+
+        [1,2,3].forEach(i => {
+            if (data[`a${i}`]) {
+                const btn = document.createElement('button');
+                btn.className = 'ans';
+                btn.innerText = data[`a${i}`];
+                btn.onclick = () => { score += parseInt(data[`v${i}`]); step++; render(); };
+                list.appendChild(btn);
+            }
+        });
+        document.getElementById('progress').style.width = (step / config.questions.length) * 100 + '%';
+    }
+
+    async function sendTG(res, pts) {
+        const s = config.settings;
+        if (!s.tgToken || !s.tgChatId) return;
+        const msg = `🔔 *Тест пройден!*\n👤 Тип: *${res}*\n📊 Баллы: ${pts}`;
+        const url = `https://api.telegram.org/bot${s.tgToken}/sendMessage?chat_id=${s.tgChatId}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`;
+        fetch(url);
+    }
+
+    function finish() {
+        document.getElementById('quiz-ui').style.display = 'none';
+        document.getElementById('result-ui').style.display = 'block';
+        
+        const avg = score / config.questions.length;
+        let res = {};
+
+        if (avg < 0.7) {
+            res = { n: "Интроверт", e: "🧘‍♂️", d: "Твоя сила в глубине и смыслах. В инфобизнесе тебе лучше делать ставку на автоворонки.", t: ["Текстовые воронки", "Глубокий продукт", "Автоматизация"], l: config.settings.urlIntro };
+        } else if (avg < 1.4) {
+            res = { n: "Амбиверт", e: "🌓", d: "Золотая середина! Ты можешь и вебинар провести, и стратегию в тишине прописать.", t: ["Гибридные запуски", "Баланс отдыха и движа", "Личный бренд + система"], l: config.settings.urlAmbi };
+        } else {
+            res = { n: "Экстраверт", e: "🔥", d: "Человек-энергия! Твой бизнес растет через эфиры, нетворкинг и личную харизму.", t: ["Прямые продажи", "Публичные выступления", "Масштаб через людей"], l: config.settings.urlExtra };
+        }
+
+        document.getElementById('res-emoji').innerText = res.e;
+        document.getElementById('res-name').innerText = res.n;
+        document.getElementById('res-name').style.color = config.settings.primary;
+        document.getElementById('res-desc').innerText = res.d;
+        document.getElementById('res-tips').innerHTML = res.t.map(i => `<li>${i}</li>`).join('');
+        
+        const link = document.getElementById('res-link');
+        if (res.l) { link.href = res.l; link.innerText = `Получить стратегию ${res.n}а`; }
+        else { link.style.display = 'none'; }
+
+        sendTG(res.n, score);
+    }
+
+    render();
+</script>
+</body>
+</html>
