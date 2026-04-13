@@ -8,16 +8,15 @@
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         h1 { color: #6c5ce7; border-bottom: 2px solid #6c5ce7; padding-bottom: 10px; }
         .section { margin-bottom: 30px; padding: 20px; border: 1px solid #e1e4e8; border-radius: 10px; background: #fff; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
         .q-card { background: #f8f9fa; border-left: 5px solid #6c5ce7; padding: 20px; margin-bottom: 15px; position: relative; border-radius: 0 8px 8px 0; }
         label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 0.9rem; }
-        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        .row { display: flex; gap: 10px; align-items: center; }
+        input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
         .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-save { background: #27ae60; color: white; width: 100%; font-size: 1.2rem; margin-top: 20px; }
+        .btn-save { background: #27ae60; color: white; width: 100%; font-size: 1.2rem; margin-top: 20px; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2); }
         .btn-add { background: #6c5ce7; color: white; margin-top: 10px; }
         .btn-del { background: #ff7675; color: white; position: absolute; right: 10px; top: 10px; padding: 5px 10px; font-size: 0.8rem; }
-        .hint { font-size: 0.8rem; color: #636e72; margin-bottom: 10px; }
+        .row { display: flex; gap: 10px; align-items: center; }
     </style>
 </head>
 <body>
@@ -26,78 +25,74 @@
     <h1>Настройки Квиза</h1>
     
     <div class="section">
-        <h3>🎨 Оформление</h3>
-        <div class="grid">
-            <div>
-                <label>Цвет фона</label>
-                <input type="color" id="bg-color">
-            </div>
-            <div>
-                <label>Цвет кнопок и акцентов</label>
-                <input type="color" id="primary-color">
-            </div>
-            <div>
-                <label>Цвет текста</label>
-                <input type="color" id="text-color">
-            </div>
-        </div>
-    </div>
-
-    <div class="section">
         <h3>🤖 Telegram Уведомления</h3>
-        <p class="hint">Чтобы получать данные о прохождениях в ЛС</p>
         <div class="grid">
             <div>
                 <label>API Токен бота (@BotFather)</label>
-                <input type="text" id="tg-token" placeholder="123456:ABCDE...">
+                <input type="text" id="tg-token" placeholder="Введите токен...">
             </div>
             <div>
                 <label>Твой Chat ID (@userinfobot)</label>
-                <input type="text" id="tg-chatid" placeholder="12345678">
+                <input type="text" id="tg-chatid" placeholder="Введите ID...">
             </div>
         </div>
     </div>
 
     <div class="section">
-        <h3>🔗 Сегментация (Ссылки в конце)</h3>
-        <p class="hint">Куда пойдет человек после теста. Добавляй ?start=... для аналитики в боте.</p>
+        <h3>🔗 Ссылки для сегментации</h3>
         <label>Для Интровертов</label>
-        <input type="text" id="url-intro" placeholder="https://t.me/bot?start=intro">
+        <input type="text" id="url-intro">
         <label>Для Амбивертов</label>
-        <input type="text" id="url-ambi" placeholder="https://t.me/bot?start=ambi">
+        <input type="text" id="url-ambi">
         <label>Для Экстравертов</label>
-        <input type="text" id="url-extra" placeholder="https://t.me/bot?start=extra">
+        <input type="text" id="url-extra">
     </div>
 
     <div class="section">
-        <h3>📝 Вопросы (0 - интро, 1 - амби, 2 - экстра)</h3>
+        <h3>🎨 Оформление</h3>
+        <div class="grid">
+            <div><label>Фон страницы</label><input type="color" id="bg-color"></div>
+            <div><label>Цвет акцентов</label><input type="color" id="primary-color"></div>
+            <div><label>Цвет текста</label><input type="color" id="text-color"></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>📝 Вопросы квиза</h3>
         <div id="questions-list"></div>
         <button class="btn btn-add" onclick="addQuestion()">+ Добавить вопрос</button>
     </div>
 
-    <button class="btn btn-save" onclick="saveAll()">СОХРАНИТЬ И ОБНОВИТЬ КВИЗ</button>
+    <button class="btn btn-save" onclick="saveAll()">СОХРАНИТЬ ВСЕ ДАННЫЕ</button>
 </div>
 
 <script>
     const STORAGE_KEY = 'quiz_config_pro';
 
+    // Загрузка данных или дефолтные значения
     let config = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-        settings: { primary: '#6c5ce7', bg: '#f9f9fb', text: '#2d3436', tgToken: '', tgChatId: '', urlIntro: '', urlAmbi: '', urlExtra: '' },
+        settings: { 
+            primary: '#6c5ce7', bg: '#f9f9fb', text: '#2d3436', 
+            tgToken: '', tgChatId: '', 
+            urlIntro: '', urlAmbi: '', urlExtra: '' 
+        },
         questions: [
-            { q: "Где ты быстрее «заряжаешь батарейку»?", a1: "Среди людей", v1: 2, a2: "В одиночестве", v2: 0, a3: "В маленькой компании", v3: 1 }
+            { q: "Где ты берешь энергию?", a1: "С людьми", v1: 2, a2: "В тишине", v2: 0, a3: "В узком кругу", v3: 1 }
         ]
     };
 
     function init() {
         const s = config.settings;
-        document.getElementById('bg-color').value = s.bg;
-        document.getElementById('primary-color').value = s.primary;
-        document.getElementById('text-color').value = s.text;
-        document.getElementById('tg-token').value = s.tgToken;
-        document.getElementById('tg-chatid').value = s.tgChatId;
-        document.getElementById('url-intro').value = s.urlIntro;
-        document.getElementById('url-ambi').value = s.urlAmbi;
-        document.getElementById('url-extra').value = s.urlExtra;
+        // Заполняем поля из памяти
+        document.getElementById('tg-token').value = s.tgToken || '';
+        document.getElementById('tg-chatid').value = s.tgChatId || '';
+        document.getElementById('url-intro').value = s.urlIntro || '';
+        document.getElementById('url-ambi').value = s.urlAmbi || '';
+        document.getElementById('url-extra').value = s.urlExtra || '';
+        document.getElementById('bg-color').value = s.bg || '#f9f9fb';
+        document.getElementById('primary-color').value = s.primary || '#6c5ce7';
+        document.getElementById('text-color').value = s.text || '#2d3436';
+        
         renderQuestions();
     }
 
@@ -109,35 +104,61 @@
             div.className = 'q-card';
             div.innerHTML = `
                 <button class="btn btn-del" onclick="deleteQ(${i})">Удалить</button>
-                <input type="text" placeholder="Вопрос" value="${item.q}" onchange="updateQ(${i}, 'q', this.value)">
-                <div class="row"><input type="text" placeholder="Ответ 1" value="${item.a1}" onchange="updateQ(${i}, 'a1', this.value)"><input type="number" value="${item.v1}" onchange="updateQ(${i}, 'v1', this.value)" style="width:50px"></div>
-                <div class="row"><input type="text" placeholder="Ответ 2" value="${item.a2}" onchange="updateQ(${i}, 'a2', this.value)"><input type="number" value="${item.v2}" onchange="updateQ(${i}, 'v2', this.value)" style="width:50px"></div>
-                <div class="row"><input type="text" placeholder="Ответ 3" value="${item.a3 || ''}" onchange="updateQ(${i}, 'a3', this.value)"><input type="number" value="${item.v3 || 0}" onchange="updateQ(${i}, 'v3', this.value)" style="width:50px"></div>
+                <label>Вопрос №${i+1}</label>
+                <input type="text" value="${item.q}" oninput="updateQ(${i}, 'q', this.value)">
+                <div class="row">
+                    <input type="text" placeholder="Экстраверт" value="${item.a1}" oninput="updateQ(${i}, 'a1', this.value)">
+                    <input type="number" value="${item.v1}" oninput="updateQ(${i}, 'v1', this.value)" style="width:60px">
+                </div>
+                <div class="row">
+                    <input type="text" placeholder="Интроверт" value="${item.a2}" oninput="updateQ(${i}, 'a2', this.value)">
+                    <input type="number" value="${item.v2}" oninput="updateQ(${i}, 'v2', this.value)" style="width:60px">
+                </div>
+                <div class="row">
+                    <input type="text" placeholder="Амбиверт" value="${item.a3 || ''}" oninput="updateQ(${i}, 'a3', this.value)">
+                    <input type="number" value="${item.v3 || 1}" oninput="updateQ(${i}, 'v3', this.value)" style="width:60px">
+                </div>
             `;
             list.appendChild(div);
         });
     }
 
-    function updateQ(i, f, v) { config.questions[i][f] = v; }
-    function addQuestion() { config.questions.push({ q: "Новый вопрос", a1: "Вариант 1", v1: 2, a2: "Вариант 2", v2: 0, a3: "", v3: 1 }); renderQuestions(); }
-    function deleteQ(i) { config.questions.splice(i, 1); renderQuestions(); }
-
-    function saveAll() {
-        config.settings = {
-            bg: document.getElementById('bg-color').value,
-            primary: document.getElementById('primary-color').value,
-            text: document.getElementById('text-color').value,
-            tgToken: document.getElementById('tg-token').value,
-            tgChatId: document.getElementById('tg-chatid').value,
-            urlIntro: document.getElementById('url-intro').value,
-            urlAmbi: document.getElementById('url-ambi').value,
-            urlExtra: document.getElementById('url-extra').value
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-        alert('Данные сохранены! Теперь открой index.html');
+    function updateQ(i, field, val) {
+        config.questions[i][field] = val;
     }
 
-    init();
+    function addQuestion() {
+        config.questions.push({ q: "Твой вопрос?", a1: "", v1: 2, a2: "", v2: 0, a3: "", v3: 1 });
+        renderQuestions();
+    }
+
+    function deleteQ(i) {
+        config.questions.splice(i, 1);
+        renderQuestions();
+    }
+
+    function saveAll() {
+        // Собираем настройки из инпутов
+        config.settings = {
+            tgToken: document.getElementById('tg-token').value.trim(),
+            tgChatId: document.getElementById('tg-chatid').value.trim(),
+            urlIntro: document.getElementById('url-intro').value.trim(),
+            urlAmbi: document.getElementById('url-ambi').value.trim(),
+            urlExtra: document.getElementById('url-extra').value.trim(),
+            bg: document.getElementById('bg-color').value,
+            primary: document.getElementById('primary-color').value,
+            text: document.getElementById('text-color').value
+        };
+
+        // Сохраняем в localStorage
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        
+        console.log("Данные сохранены:", config);
+        alert('✅ Все настройки успешно сохранены!');
+    }
+
+    // Инициализация при загрузке
+    window.onload = init;
 </script>
 </body>
 </html>
