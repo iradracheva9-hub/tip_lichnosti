@@ -3,47 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тест: Кто ты в инфобизнесе?</title>
+    <title>Квиз на тип личности</title>
     <style>
         :root { --p: #6c5ce7; --bg: #f9f9fb; --t: #2d3436; }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--t); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        #quiz-box { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); width: 90%; max-width: 550px; text-align: center; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--t); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        #box { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); width: 90%; max-width: 550px; text-align: center; }
         .progress-bar { height: 6px; width: 100%; background: #eee; border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
         #progress { height: 100%; background: var(--p); width: 0%; transition: 0.4s; }
-        h2 { font-size: 1.5rem; margin-bottom: 25px; line-height: 1.4; }
-        .options { display: flex; flex-direction: column; gap: 12px; }
-        button.ans { padding: 18px; border: 2px solid #f0f0f0; border-radius: 16px; background: none; cursor: pointer; transition: 0.2s; font-size: 1.05rem; color: var(--t); text-align: left; }
-        button.ans:hover { border-color: var(--p); background: #fdfdff; transform: translateY(-2px); }
-        #result-ui { display: none; }
-        .res-name { font-size: 2.2rem; font-weight: 800; margin: 10px 0; color: var(--p); }
-        .res-desc { font-size: 1.1rem; line-height: 1.6; margin-bottom: 25px; color: #444; }
-        .tips-container { text-align: left; background: #f8f9ff; padding: 25px; border-radius: 20px; margin-bottom: 30px; }
-        .tips-list { padding-left: 20px; margin: 0; }
-        .tips-list li { margin-bottom: 12px; font-size: 1rem; color: #333; }
-        .cta-btn { display: block; text-decoration: none; background: var(--p) !important; color: white !important; padding: 22px; border-radius: 20px; font-weight: bold; font-size: 1.2rem; margin-top: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); transition: 0.3s; }
-        .cta-btn:hover { transform: scale(1.02); filter: brightness(1.1); }
-        .restart { display: inline-block; margin-top: 25px; color: #999; text-decoration: none; font-size: 0.9rem; border-bottom: 1px solid #ddd; }
+        .ans-btn { display: block; width: 100%; padding: 18px; border: 2px solid #f0f0f0; border-radius: 16px; background: none; cursor: pointer; margin-bottom: 12px; font-size: 1.05rem; text-align: left; transition: 0.2s; color: var(--t); }
+        .ans-btn:hover { border-color: var(--p); background: #fdfdff; }
+        #result { display: none; }
+        .cta-btn { display: block; text-decoration: none; background: var(--p) !important; color: white !important; padding: 22px; border-radius: 20px; font-weight: bold; font-size: 1.2rem; margin-top: 20px; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .tips { text-align: left; background: #f8f9ff; padding: 25px; border-radius: 20px; margin-bottom: 30px; }
+        .tips li { margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div id="quiz-box">
+<div id="box">
     <div id="quiz-ui">
         <div class="progress-bar"><div id="progress"></div></div>
         <h2 id="q-text">Загрузка...</h2>
-        <div id="opt-list" class="options"></div>
+        <div id="options"></div>
     </div>
 
-    <div id="result-ui">
-        <div id="res-emoji" style="font-size: 5rem; margin-bottom: 10px;"></div>
-        <div id="res-name" class="res-name"></div>
-        <p id="res-desc" class="res-desc"></p>
-        <div class="tips-container">
-            <span style="font-weight:bold; color:var(--p); margin-bottom:10px; display:block;">Твоя стратегия роста:</span>
-            <ul id="res-tips" class="tips-list"></ul>
+    <div id="result">
+        <div id="res-emoji" style="font-size: 5rem;"></div>
+        <h1 id="res-name" style="color: var(--p);"></h1>
+        <p id="res-desc" style="line-height: 1.6;"></p>
+        <div class="tips">
+            <strong>Стратегия роста:</strong>
+            <ul id="res-tips" style="padding-left: 20px; margin-top: 10px;"></ul>
         </div>
         <a href="#" id="res-link" class="cta-btn">Получить результат</a>
-        <a href="#" onclick="location.reload()" class="restart">Пройти заново</a>
+        <a href="#" onclick="location.reload()" style="display:block; margin-top: 20px; color: #999;">Пройти заново</a>
     </div>
 </div>
 
@@ -63,52 +56,46 @@
         if (step >= config.questions.length) return finish();
         const data = config.questions[step];
         document.getElementById('q-text').innerText = data.q;
-        const list = document.getElementById('opt-list');
-        list.innerHTML = '';
+        const optBox = document.getElementById('options');
+        optBox.innerHTML = '';
         [1,2].forEach(i => {
             if (data[`a${i}`]) {
-                const btn = document.createElement('button');
-                btn.className = 'ans';
-                btn.innerText = data[`a${i}`];
-                btn.onclick = () => { score += parseInt(data[`v${i}`]); step++; render(); };
-                list.appendChild(btn);
+                const b = document.createElement('button');
+                b.className = 'ans-btn';
+                b.innerText = data[`a${i}`];
+                b.onclick = () => { score += parseInt(data[`v${i}`]); step++; render(); };
+                optBox.appendChild(b);
             }
         });
         document.getElementById('progress').style.width = (step / config.questions.length) * 100 + '%';
     }
 
-    async function sendTG(n, s) {
-        const conf = config.settings;
-        if (!conf.tgToken || !conf.tgChatId) return;
-        const msg = `🔔 *Тест пройден!*\n👤 Тип: *${n}*\n📊 Баллы: ${s}`;
-        fetch(`https://api.telegram.org/bot${conf.tgToken}/sendMessage?chat_id=${conf.tgChatId}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`);
-    }
-
     function finish() {
         document.getElementById('quiz-ui').style.display = 'none';
-        document.getElementById('result-ui').style.display = 'block';
+        document.getElementById('result').style.display = 'block';
         const avg = score / config.questions.length;
-        let res = {};
+        let r = {};
 
         if (avg < 0.7) {
-            res = { n: "Интроверт", e: "🧘‍♂️", d: "Твоя суперсила — глубина и фокус. Твой путь в бизнесе — это тихая экспертность.", t: ["Статьи и лонгриды", "Автоворонки и боты", "Качество продукта", "Малые группы"], l: config.settings.urlIntro, bt: config.settings.btnIntro };
+            r = { n: "Интроверт", e: "🧘‍♂️", d: "Твоя сила в глубине и смыслах.", t: ["Автоворонки", "Тексты", "Малые группы"], l: config.settings.urlIntro, bt: config.settings.btnIntro };
         } else if (avg < 1.4) {
-            res = { n: "Амбиверт", e: "🌓", d: "Ты — универсальный солдат. Одинаково хорош и в системе, и в общении.", t: ["Гибридные запуски", "Баланс тишины и движа", "Личный бренд + система"], l: config.settings.urlAmbi, bt: config.settings.btnAmbi };
+            r = { n: "Амбиверт", e: "🌓", d: "Ты универсальный игрок.", t: ["Гибридные модели", "Баланс отдыха", "Системность"], l: config.settings.urlAmbi, bt: config.settings.btnAmbi };
         } else {
-            res = { n: "Экстраверт", e: "🔥", d: "Ты — человек-магнит! Твоя энергия — главный капитал. Продавай через драйв.", t: ["Прямые эфиры и сторис", "Нетворкинг", "Групповые продажи"], l: config.settings.urlExtra, bt: config.settings.btnExtra };
+            r = { n: "Экстраверт", e: "🔥", d: "Ты человек-магнит!", t: ["Эфиры", "Нетворкинг", "Групповые продажи"], l: config.settings.urlExtra, bt: config.settings.btnExtra };
         }
 
-        document.getElementById('res-emoji').innerText = res.e;
-        document.getElementById('res-name').innerText = res.n;
-        document.getElementById('res-desc').innerText = res.d;
-        document.getElementById('res-tips').innerHTML = res.t.map(i => `<li>${i}</li>`).join('');
+        document.getElementById('res-emoji').innerText = r.e;
+        document.getElementById('res-name').innerText = r.n;
+        document.getElementById('res-desc').innerText = r.d;
+        document.getElementById('res-tips').innerHTML = r.t.map(i => `<li>${i}</li>`).join('');
         
-        const linkBtn = document.getElementById('res-link');
-        linkBtn.href = res.l || "#";
-        linkBtn.innerText = res.bt || `Забрать стратегию для ${res.n}а`;
-        if (!res.l) linkBtn.style.opacity = "0.5";
+        const link = document.getElementById('res-link');
+        link.href = r.l || "#";
+        link.innerText = r.bt || `Забрать стратегию для ${r.n}а`;
 
-        sendTG(res.n, score);
+        if (config.settings.tgToken) {
+            fetch(`https://api.telegram.org/bot${config.settings.tgToken}/sendMessage?chat_id=${config.settings.tgChatId}&text=${encodeURIComponent('Новый результат: ' + r.n)}`);
+        }
     }
     render();
 </script>
