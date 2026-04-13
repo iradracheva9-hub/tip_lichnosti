@@ -3,98 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тест на тип личности</title>
+    <title>Тест: Кто ты в инфобизнесе?</title>
     <style>
-        :root { 
-            --p: #6c5ce7; 
-            --bg: #f9f9fb; 
-            --t: #2d3436; 
-        }
-        
-        body { 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            background: var(--bg); 
-            color: var(--t); 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-        }
-
-        #quiz-box { 
-            background: white; 
-            padding: 40px; 
-            border-radius: 30px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.05); 
-            width: 90%; 
-            max-width: 550px; 
-            text-align: center; 
-        }
-
+        :root { --p: #6c5ce7; --bg: #f9f9fb; --t: #2d3436; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--t); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        #quiz-box { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); width: 90%; max-width: 550px; text-align: center; }
         .progress-bar { height: 6px; width: 100%; background: #eee; border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
         #progress { height: 100%; background: var(--p); width: 0%; transition: 0.4s; }
-
         h2 { font-size: 1.5rem; margin-bottom: 25px; line-height: 1.4; }
-
         .options { display: flex; flex-direction: column; gap: 12px; }
-
-        button.ans { 
-            padding: 18px; 
-            border: 2px solid #f0f0f0; 
-            border-radius: 16px; 
-            background: none; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            font-size: 1.05rem; 
-            color: var(--t); 
-            text-align: left;
-            font-family: inherit;
-        }
-
+        button.ans { padding: 18px; border: 2px solid #f0f0f0; border-radius: 16px; background: none; cursor: pointer; transition: 0.2s; font-size: 1.05rem; color: var(--t); text-align: left; }
         button.ans:hover { border-color: var(--p); background: #fdfdff; transform: translateY(-2px); }
-
-        #result-ui { display: none; text-align: center; }
-
+        #result-ui { display: none; }
         .res-name { font-size: 2.2rem; font-weight: 800; margin: 10px 0; color: var(--p); }
-        
-        .res-desc { 
-            font-size: 1.1rem; 
-            line-height: 1.6; 
-            margin-bottom: 25px; 
-            color: #444; 
-        }
-
-        .tips-container {
-            text-align: left;
-            background: #f8f9ff;
-            padding: 25px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-        }
-
-        .tips-title { font-weight: bold; margin-bottom: 15px; display: block; color: var(--p); font-size: 1.1rem; }
-
+        .res-desc { font-size: 1.1rem; line-height: 1.6; margin-bottom: 25px; color: #444; }
+        .tips-container { text-align: left; background: #f8f9ff; padding: 25px; border-radius: 20px; margin-bottom: 30px; }
         .tips-list { padding-left: 20px; margin: 0; }
-        .tips-list li { margin-bottom: 12px; font-size: 1rem; line-height: 1.5; color: #333; }
-
-        /* Стилизация Кнопки перехода */
-        .cta-btn { 
-            display: block; 
-            text-decoration: none; 
-            background-color: var(--p) !important; 
-            color: white !important; 
-            padding: 22px; 
-            border-radius: 20px; 
-            font-weight: bold; 
-            font-size: 1.2rem; 
-            margin-top: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            transition: 0.3s;
-        }
-
+        .tips-list li { margin-bottom: 12px; font-size: 1rem; color: #333; }
+        .cta-btn { display: block; text-decoration: none; background: var(--p) !important; color: white !important; padding: 22px; border-radius: 20px; font-weight: bold; font-size: 1.2rem; margin-top: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); transition: 0.3s; }
         .cta-btn:hover { transform: scale(1.02); filter: brightness(1.1); }
-        
         .restart { display: inline-block; margin-top: 25px; color: #999; text-decoration: none; font-size: 0.9rem; border-bottom: 1px solid #ddd; }
     </style>
 </head>
@@ -103,7 +30,7 @@
 <div id="quiz-box">
     <div id="quiz-ui">
         <div class="progress-bar"><div id="progress"></div></div>
-        <h2 id="q-text">Загрузка вопросов...</h2>
+        <h2 id="q-text">Загрузка...</h2>
         <div id="opt-list" class="options"></div>
     </div>
 
@@ -111,32 +38,26 @@
         <div id="res-emoji" style="font-size: 5rem; margin-bottom: 10px;"></div>
         <div id="res-name" class="res-name"></div>
         <p id="res-desc" class="res-desc"></p>
-        
         <div class="tips-container">
-            <span class="tips-title">Твоя стратегия роста в бизнесе:</span>
+            <span style="font-weight:bold; color:var(--p); margin-bottom:10px; display:block;">Твоя стратегия роста:</span>
             <ul id="res-tips" class="tips-list"></ul>
         </div>
-        
         <a href="#" id="res-link" class="cta-btn">Получить результат</a>
-        
-        <a href="#" onclick="location.reload()" class="restart">Пройти тест заново</a>
+        <a href="#" onclick="location.reload()" class="restart">Пройти заново</a>
     </div>
 </div>
 
 <script>
-    // Подгрузка конфига
     const config = JSON.parse(localStorage.getItem('quiz_config_pro')) || {
         settings: { primary: '#6c5ce7', bg: '#f9f9fb', text: '#2d3436' },
-        questions: [{ q: "Где вы берете энергию?", a1: "С людьми", v1: 2, a2: "В тишине", v2: 0, a3: "В узком кругу", v3: 1 }]
+        questions: [{ q: "Где берешь энергию?", a1: "С людьми", v1: 2, a2: "В тишине", v2: 0 }]
     };
 
-    // Применение цветов из админки
     document.documentElement.style.setProperty('--p', config.settings.primary);
     document.documentElement.style.setProperty('--bg', config.settings.bg);
     document.documentElement.style.setProperty('--t', config.settings.text);
 
-    let step = 0;
-    let score = 0;
+    let step = 0; let score = 0;
 
     function render() {
         if (step >= config.questions.length) return finish();
@@ -144,9 +65,8 @@
         document.getElementById('q-text').innerText = data.q;
         const list = document.getElementById('opt-list');
         list.innerHTML = '';
-
-        [1,2,3].forEach(i => {
-            if (data[`a${i}`] && data[`a${i}`].trim() !== "") {
+        [1,2].forEach(i => {
+            if (data[`a${i}`]) {
                 const btn = document.createElement('button');
                 btn.className = 'ans';
                 btn.innerText = data[`a${i}`];
@@ -157,68 +77,39 @@
         document.getElementById('progress').style.width = (step / config.questions.length) * 100 + '%';
     }
 
-    async function sendTG(resN, pts) {
-        const s = config.settings;
-        if (!s.tgToken || !s.tgChatId) return;
-        const msg = `🔔 *Тест пройден!*\n👤 Тип: *${resN}*\n📊 Баллы: ${pts}`;
-        const url = `https://api.telegram.org/bot${s.tgToken}/sendMessage?chat_id=${s.tgChatId}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`;
-        fetch(url).catch(e => console.log(e));
+    async function sendTG(n, s) {
+        const conf = config.settings;
+        if (!conf.tgToken || !conf.tgChatId) return;
+        const msg = `🔔 *Тест пройден!*\n👤 Тип: *${n}*\n📊 Баллы: ${s}`;
+        fetch(`https://api.telegram.org/bot${conf.tgToken}/sendMessage?chat_id=${conf.tgChatId}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`);
     }
 
     function finish() {
         document.getElementById('quiz-ui').style.display = 'none';
         document.getElementById('result-ui').style.display = 'block';
-        
         const avg = score / config.questions.length;
         let res = {};
 
-        // Описания
         if (avg < 0.7) {
-            res = { 
-                n: "Интроверт", e: "🧘‍♂️", 
-                d: "Твоя суперсила — глубина и фокус. Тебе не нужно заставлять себя быть «шоуменом», чтобы продавать. Твой путь в бизнесе — это тихая экспертность.", 
-                t: ["Выстраивай продажи через смыслы и тексты", "Используй автоворонки и ботов", "Делай ставку на качество продукта", "Выбирай работу в малых группах"], 
-                l: config.settings.urlIntro 
-            };
+            res = { n: "Интроверт", e: "🧘‍♂️", d: "Твоя суперсила — глубина и фокус. Твой путь в бизнесе — это тихая экспертность.", t: ["Статьи и лонгриды", "Автоворонки и боты", "Качество продукта", "Малые группы"], l: config.settings.urlIntro, bt: config.settings.btnIntro };
         } else if (avg < 1.4) {
-            res = { 
-                n: "Амбиверт", e: "🌓", 
-                d: "Ты — универсальный игрок. Ты одинаково хорош и в системной работе за кадром, и в живом общении. Это редкий дар гибкости.", 
-                t: ["Чередуй фазы запуска и спокойной работы", "Используй гибридные воронки", "Вовремя уходи в тишину", "Твоя сила в балансе"], 
-                l: config.settings.urlAmbi 
-            };
+            res = { n: "Амбиверт", e: "🌓", d: "Ты — универсальный солдат. Одинаково хорош и в системе, и в общении.", t: ["Гибридные запуски", "Баланс тишины и движа", "Личный бренд + система"], l: config.settings.urlAmbi, bt: config.settings.btnAmbi };
         } else {
-            res = { 
-                n: "Экстраверт", e: "🔥", 
-                d: "Ты — человек-магнит! Твоя энергия — это твой главный капитал. Люди покупают у тебя, потому что заряжаются твоим драйвом.", 
-                t: ["Продавай через прямые эфиры и сторис", "Развивай нетворкинг и партнерства", "Создавай вокруг себя сообщества", "Найми ассистента для рутины"], 
-                l: config.settings.urlExtra 
-            };
+            res = { n: "Экстраверт", e: "🔥", d: "Ты — человек-магнит! Твоя энергия — главный капитал. Продавай через драйв.", t: ["Прямые эфиры и сторис", "Нетворкинг", "Групповые продажи"], l: config.settings.urlExtra, bt: config.settings.btnExtra };
         }
 
         document.getElementById('res-emoji').innerText = res.e;
         document.getElementById('res-name').innerText = res.n;
-        document.getElementById('res-name').style.color = config.settings.primary;
         document.getElementById('res-desc').innerText = res.d;
         document.getElementById('res-tips').innerHTML = res.t.map(i => `<li>${i}</li>`).join('');
         
-        // РАБОТА С КНОПКОЙ
         const linkBtn = document.getElementById('res-link');
-        
-        if (res.l && res.l.trim() !== "") {
-            linkBtn.href = res.l;
-            linkBtn.innerText = `Забрать стратегию для ${res.n}а`;
-            linkBtn.style.opacity = "1";
-        } else {
-            // Если ссылки нет, кнопка все равно есть, но уведомляет об ошибке
-            linkBtn.href = "#"; 
-            linkBtn.innerText = `Забрать стратегию (ссылка не задана)`;
-            linkBtn.style.opacity = "0.6";
-        }
+        linkBtn.href = res.l || "#";
+        linkBtn.innerText = res.bt || `Забрать стратегию для ${res.n}а`;
+        if (!res.l) linkBtn.style.opacity = "0.5";
 
         sendTG(res.n, score);
     }
-
     render();
 </script>
 </body>
