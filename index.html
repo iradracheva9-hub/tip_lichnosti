@@ -5,15 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Тест на тип личности</title>
     <style>
-        /* Переменные дизайна (берутся из админки) */
-        :root { 
-            --p: #6c5ce7; 
-            --bg: #f9f9fb; 
-            --t: #2d3436; 
-        }
+        :root { --p: #6c5ce7; --bg: #f9f9fb; --t: #2d3436; }
         
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
             background: var(--bg); 
             color: var(--t); 
             margin: 0; 
@@ -27,28 +22,14 @@
             background: white; 
             padding: 40px; 
             border-radius: 30px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05); 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05); 
             width: 90%; 
-            max-width: 550px; /* Увеличили ширину для текста */
+            max-width: 550px; /* Широкая карточка для длинного текста */
             text-align: center; 
-            transition: 0.3s;
         }
 
-        .progress-bar { 
-            height: 6px; 
-            width: 100%; 
-            background: #eee; 
-            border-radius: 10px; 
-            margin-bottom: 30px; 
-            overflow: hidden; 
-        }
-
-        #progress { 
-            height: 100%; 
-            background: var(--p); 
-            width: 0%; 
-            transition: 0.4s; 
-        }
+        .progress-bar { height: 6px; width: 100%; background: #eee; border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
+        #progress { height: 100%; background: var(--p); width: 0%; transition: 0.4s; }
 
         h2 { font-size: 1.5rem; margin-bottom: 25px; line-height: 1.4; }
 
@@ -64,43 +45,37 @@
             font-size: 1.05rem; 
             color: var(--t); 
             text-align: left;
+            font-family: inherit;
         }
 
-        button.ans:hover { 
-            border-color: var(--p); 
-            background: #fdfdff; 
-            transform: translateY(-2px); 
-        }
+        button.ans:hover { border-color: var(--p); background: #fdfdff; transform: translateY(-2px); }
 
-        #result-ui { display: none; }
+        #result-ui { display: none; text-align: center; }
 
-        .res-name { 
-            font-size: 2.2rem; 
-            font-weight: 800; 
-            margin: 10px 0; 
-            color: var(--p); 
-        }
-
+        .res-name { font-size: 2.2rem; font-weight: 800; margin: 10px 0; color: var(--p); }
+        
+        /* Стиль для развернутого описания */
         .res-desc { 
             font-size: 1.1rem; 
             line-height: 1.6; 
             margin-bottom: 25px; 
-            color: #555; 
+            color: #444; 
+            text-align: center;
         }
 
-        .tips-list { 
-            text-align: left; 
-            background: #f8f9ff; 
-            padding: 20px 20px 20px 40px; 
-            border-radius: 20px; 
-            margin-bottom: 30px; 
+        /* Стиль для списка стратегий */
+        .tips-container {
+            text-align: left;
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
         }
 
-        .tips-list li { 
-            margin-bottom: 12px; 
-            font-size: 0.95rem; 
-            line-height: 1.5; 
-        }
+        .tips-title { font-weight: bold; margin-bottom: 15px; display: block; color: var(--p); font-size: 1.1rem; }
+
+        .tips-list { padding-left: 20px; margin: 0; }
+        .tips-list li { margin-bottom: 12px; font-size: 1rem; line-height: 1.5; color: #333; }
 
         .cta-btn { 
             display: block; 
@@ -110,21 +85,13 @@
             padding: 20px; 
             border-radius: 18px; 
             font-weight: bold; 
-            font-size: 1.1rem; 
+            font-size: 1.2rem; 
             transition: 0.3s;
             box-shadow: 0 10px 20px rgba(108, 92, 231, 0.2);
         }
 
         .cta-btn:hover { transform: scale(1.02); opacity: 0.9; }
-
-        .restart-link { 
-            display: inline-block; 
-            margin-top: 20px; 
-            color: #999; 
-            text-decoration: none; 
-            font-size: 0.9rem; 
-            border-bottom: 1px solid #ddd; 
-        }
+        .restart { display: inline-block; margin-top: 25px; color: #999; text-decoration: none; font-size: 0.9rem; border-bottom: 1px solid #ddd; }
     </style>
 </head>
 <body>
@@ -132,7 +99,7 @@
 <div id="quiz-box">
     <div id="quiz-ui">
         <div class="progress-bar"><div id="progress"></div></div>
-        <h2 id="q-text">Загрузка...</h2>
+        <h2 id="q-text">Загрузка вопросов...</h2>
         <div id="opt-list" class="options"></div>
     </div>
 
@@ -141,22 +108,22 @@
         <div id="res-name" class="res-name"></div>
         <p id="res-desc" class="res-desc"></p>
         
-        <div style="text-align: left; font-weight: bold; margin-bottom: 10px; padding-left: 5px;">Твоя стратегия роста:</div>
-        <ul id="res-tips" class="tips-list"></ul>
+        <div class="tips-container">
+            <span class="tips-title">Твоя стратегия роста в бизнесе:</span>
+            <ul id="res-tips" class="tips-list"></ul>
+        </div>
         
-        <a href="#" id="res-link" class="cta-btn">Получить стратегию</a>
-        <a href="#" onclick="location.reload()" class="restart-link">Пройти заново</a>
+        <a href="#" id="res-link" class="cta-btn">Забрать материалы</a>
+        <a href="#" onclick="location.reload()" class="restart">Пройти тест заново</a>
     </div>
 </div>
 
 <script>
-    // Загружаем конфиг из localStorage
     const config = JSON.parse(localStorage.getItem('quiz_config_pro')) || {
         settings: { primary: '#6c5ce7', bg: '#f9f9fb', text: '#2d3436' },
-        questions: [{ q: "Где ты берешь энергию?", a1: "С людьми", v1: 2, a2: "В тишине", v2: 0 }]
+        questions: [{ q: "Где ты берешь энергию?", a1: "С людьми", v1: 2, a2: "В тишине", v2: 0, a3: "В узком кругу", v3: 1 }]
     };
 
-    // Применяем визуальные настройки
     document.documentElement.style.setProperty('--p', config.settings.primary);
     document.documentElement.style.setProperty('--bg', config.settings.bg);
     document.documentElement.style.setProperty('--t', config.settings.text);
@@ -166,109 +133,95 @@
 
     function render() {
         if (step >= config.questions.length) return finish();
-        
         const data = config.questions[step];
         document.getElementById('q-text').innerText = data.q;
         const list = document.getElementById('opt-list');
         list.innerHTML = '';
 
-        [1, 2, 3].forEach(i => {
+        [1,2,3].forEach(i => {
             if (data[`a${i}`] && data[`a${i}`].trim() !== "") {
                 const btn = document.createElement('button');
                 btn.className = 'ans';
                 btn.innerText = data[`a${i}`];
-                btn.onclick = () => { 
-                    score += parseInt(data[`v${i}`]); 
-                    step++; 
-                    render(); 
-                };
+                btn.onclick = () => { score += parseInt(data[`v${i}`]); step++; render(); };
                 list.appendChild(btn);
             }
         });
-
         document.getElementById('progress').style.width = (step / config.questions.length) * 100 + '%';
     }
 
-    // Уведомление в Телеграм
-    async function sendTG(resTitle, pts) {
+    async function sendTG(resN, pts) {
         const s = config.settings;
         if (!s.tgToken || !s.tgChatId) return;
-        const msg = `🔔 *Тест пройден!*\n👤 Результат: *${resTitle}*\n📊 Баллы: ${pts} из ${config.questions.length * 2}`;
+        const msg = `🔔 *Тест пройден!*\n👤 Тип: *${resN}*\n📊 Баллы: ${pts}`;
         const url = `https://api.telegram.org/bot${s.tgToken}/sendMessage?chat_id=${s.tgChatId}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`;
-        try { await fetch(url); } catch(e) { console.error("TG Error", e); }
+        fetch(url).catch(e => console.log(e));
     }
 
     function finish() {
         document.getElementById('quiz-ui').style.display = 'none';
-        const resultUI = document.getElementById('result-ui');
-        resultUI.style.display = 'block';
+        document.getElementById('result-ui').style.display = 'block';
         
         const avg = score / config.questions.length;
         let res = {};
 
-        // Развернутые результаты
+        // ЖЕСТКО ПРОПИСАННЫЕ РАЗВЕРНУТЫЕ ТЕКСТЫ
         if (avg < 0.7) {
             res = { 
-                n: "Интроверт", 
-                e: "🧘‍♂️", 
-                d: "Твоя суперсила — глубина и фокус. Тебе не нужно заставлять себя быть «шоуменом», чтобы продавать. Твой путь в бизнесе — это тихая экспертность и доверие.", 
+                n: "Интроверт", e: "🧘‍♂️", 
+                d: "Твоя суперсила — глубина и фокус. Тебе не нужно заставлять себя быть «шоуменом», чтобы продавать. Твой путь в бизнесе — это тихая экспертность, которая вызывает искреннее доверие у клиентов.", 
                 t: [
-                    "Выстраивай продажи через смыслы и тексты (статьи, посты, лонгриды)",
-                    "Твои лучшие друзья — автоворонки и чат-боты, которые работают, пока ты отдыхаешь",
-                    "Делай ставку на качество продукта: люди придут за результатом, а не за эмоциями",
-                    "Вместо шумных эфиров выбирай работу в малых группах или наставничество"
+                    "Выстраивай продажи через смыслы и глубокие тексты (статьи, лонгриды)",
+                    "Используй автоворонки и ботов — они будут продавать, пока ты восстанавливаешь силы",
+                    "Делай ставку на качество продукта: люди придут к тебе за результатом, а не за хайпом",
+                    "Вместо шумных эфиров выбирай работу в малых группах или личное наставничество"
                 ], 
                 l: config.settings.urlIntro 
             };
         } else if (avg < 1.4) {
             res = { 
-                n: "Амбиверт", 
-                e: "🌓", 
-                d: "Ты — универсальный игрок. Ты одинаково хорош и в системной работе за кадром, и в живом общении. Это редкий дар гибкости.", 
+                n: "Амбиверт", e: "🌓", 
+                d: "Ты — универсальный игрок. Ты одинаково хорош и в системной работе за кадром, и в живом общении. Это редкий дар, который позволяет тебе подстраиваться под любую задачу и нишу.", 
                 t: [
-                    "Чередуй фазы: активный запуск с эфирами и спокойную работу над продуктом",
-                    "Тебе идеально подходят гибридные воронки: автоматизация + твоё личное включение",
-                    "Не забывай отдыхать от людей — тебе нужно время в тишине, чтобы не выгореть",
-                    "Твоя сила в балансе — ты понимаешь и «тихих» клиентов, и тех, кому нужен драйв"
+                    "Чередуй фазы: активный запуск с эфирами и периоды спокойной работы над продуктом",
+                    "Тебе идеально подходят гибридные воронки: автоматизация + твое личное включение",
+                    "Не забывай вовремя уходить в тишину — тебе нужно время наедине с собой, чтобы не выгореть",
+                    "Твоя сила в гибкости — ты понимаешь и «тихих» клиентов, и тех, кому нужен драйв"
                 ], 
                 l: config.settings.urlAmbi 
             };
         } else {
             res = { 
-                n: "Экстраверт", 
-                e: "🔥", 
-                d: "Ты — человек-магнит! Твоя энергия — это твой главный капитал. Люди покупают у тебя, потому что заряжаются драйвом и уверенностью.", 
+                n: "Экстраверт", e: "🔥", 
+                d: "Ты — человек-магнит! Твоя энергия — это твой главный капитал. Люди покупают у тебя, потому что буквально заряжаются твоим драйвом, уверенностью и масштабом.", 
                 t: [
-                    "Продавай через прямые эфиры, вебинары и сторис — это твой самый быстрый путь к деньгам",
-                    "Активно развивай нетворкинг и партнерства: через людей придут лучшие чеки",
-                    "Создавай вокруг себя сообщество (клубы, чаты) — тебе важно быть в центре движения",
-                    "Найми ассистента для рутины, чтобы она не гасила твой внутренний огонь"
+                    "Продавай через прямые эфиры и сторис — это твой самый быстрый и легкий путь к деньгам",
+                    "Активно развивай нетворкинг и партнерства: через людей к тебе придут самые крупные чеки",
+                    "Создавай вокруг себя сообщество (клубы, чаты) — тебе важно всегда быть в центре движения",
+                    "Обязательно найми ассистента для рутины, чтобы таблички не гасили твой внутренний огонь"
                 ], 
                 l: config.settings.urlExtra 
             };
         }
 
-        // Заполняем данные на странице
         document.getElementById('res-emoji').innerText = res.e;
         document.getElementById('res-name').innerText = res.n;
+        document.getElementById('res-name').style.color = config.settings.primary;
         document.getElementById('res-desc').innerText = res.d;
         document.getElementById('res-tips').innerHTML = res.t.map(i => `<li>${i}</li>`).join('');
         
         const linkBtn = document.getElementById('res-link');
-        if (res.l && res.l.trim() !== "") {
-            linkBtn.href = res.l;
-            linkBtn.innerText = `Забрать стратегию для ${res.n}а`;
-        } else {
-            linkBtn.style.display = 'none';
+        if (res.l) { 
+            linkBtn.href = res.l; 
+            linkBtn.innerText = `Забрать стратегию для ${res.n}а`; 
+        } else { 
+            linkBtn.style.display = 'none'; 
         }
 
-        // Отправляем уведомление админу
         sendTG(res.n, score);
     }
 
-    // Запуск теста
     render();
 </script>
-
 </body>
 </html>
