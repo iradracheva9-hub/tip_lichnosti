@@ -2,21 +2,22 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Панель управления Квизом</title>
+    <title>Админ-панель Квиза</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; color: #333; line-height: 1.5; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         h1 { color: #6c5ce7; border-bottom: 2px solid #6c5ce7; padding-bottom: 10px; }
-        .section { margin-bottom: 30px; padding: 20px; border: 1px solid #e1e4e8; border-radius: 10px; background: #fff; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .section { margin-bottom: 30px; padding: 20px; border: 1px solid #e1e4e8; border-radius: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .q-card { background: #f8f9fa; border-left: 5px solid #6c5ce7; padding: 20px; margin-bottom: 15px; position: relative; border-radius: 0 8px 8px 0; }
         label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 0.9rem; }
-        input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-save { background: #27ae60; color: white; width: 100%; font-size: 1.2rem; margin-top: 20px; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2); }
+        .btn-save { background: #27ae60; color: white; width: 100%; font-size: 1.2rem; margin-top: 20px; }
         .btn-add { background: #6c5ce7; color: white; margin-top: 10px; }
         .btn-del { background: #ff7675; color: white; position: absolute; right: 10px; top: 10px; padding: 5px 10px; font-size: 0.8rem; }
         .row { display: flex; gap: 10px; align-items: center; }
+        .group-box { background: #fcfcfc; padding: 15px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -29,70 +30,73 @@
         <div class="grid">
             <div>
                 <label>API Токен бота (@BotFather)</label>
-                <input type="text" id="tg-token" placeholder="Введите токен...">
+                <input type="text" id="tg-token" placeholder="Введите токен бота">
             </div>
             <div>
                 <label>Твой Chat ID (@userinfobot)</label>
-                <input type="text" id="tg-chatid" placeholder="Введите ID...">
+                <input type="text" id="tg-chatid" placeholder="Введите ваш ID">
             </div>
         </div>
     </div>
 
     <div class="section">
-        <h3>🔗 Ссылки для сегментации</h3>
-        <label>Для Интровертов</label>
-        <input type="text" id="url-intro">
-        <label>Для Амбивертов</label>
-        <input type="text" id="url-ambi">
-        <label>Для Экстравертов</label>
-        <input type="text" id="url-extra">
+        <h3>🔗 Настройка кнопок на выходе</h3>
+        <div class="group-box">
+            <label>ИНТРОВЕРТ</label>
+            <input type="text" id="url-intro" placeholder="Ссылка (https://...)">
+            <input type="text" id="btn-intro" placeholder="Текст на кнопке (например: Забрать PDF)">
+        </div>
+        <div class="group-box">
+            <label>АМБИВЕРТ</label>
+            <input type="text" id="url-ambi" placeholder="Ссылка (https://...)">
+            <input type="text" id="btn-ambi" placeholder="Текст на кнопке">
+        </div>
+        <div class="group-box">
+            <label>ЭКСТРАВЕРТ</label>
+            <input type="text" id="url-extra" placeholder="Ссылка (https://...)">
+            <input type="text" id="btn-extra" placeholder="Текст на кнопке">
+        </div>
     </div>
 
     <div class="section">
         <h3>🎨 Оформление</h3>
         <div class="grid">
             <div><label>Фон страницы</label><input type="color" id="bg-color"></div>
-            <div><label>Цвет акцентов</label><input type="color" id="primary-color"></div>
+            <div><label>Основной цвет (кнопки)</label><input type="color" id="primary-color"></div>
             <div><label>Цвет текста</label><input type="color" id="text-color"></div>
         </div>
     </div>
 
     <div class="section">
-        <h3>📝 Вопросы квиза</h3>
+        <h3>📝 Вопросы</h3>
         <div id="questions-list"></div>
         <button class="btn btn-add" onclick="addQuestion()">+ Добавить вопрос</button>
     </div>
 
-    <button class="btn btn-save" onclick="saveAll()">СОХРАНИТЬ ВСЕ ДАННЫЕ</button>
+    <button class="btn btn-save" onclick="saveAll()">СОХРАНИТЬ ВСЕ НАСТРОЙКИ</button>
 </div>
 
 <script>
     const STORAGE_KEY = 'quiz_config_pro';
 
-    // Загрузка данных или дефолтные значения
     let config = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-        settings: { 
-            primary: '#6c5ce7', bg: '#f9f9fb', text: '#2d3436', 
-            tgToken: '', tgChatId: '', 
-            urlIntro: '', urlAmbi: '', urlExtra: '' 
-        },
-        questions: [
-            { q: "Где ты берешь энергию?", a1: "С людьми", v1: 2, a2: "В тишине", v2: 0, a3: "В узком кругу", v3: 1 }
-        ]
+        settings: { primary: '#6c5ce7', bg: '#f9f9fb', text: '#2d3436' },
+        questions: [{ q: "Где ты берешь энергию?", a1: "С людьми", v1: 2, a2: "В тишине", v2: 0, a3: "В узком кругу", v3: 1 }]
     };
 
     function init() {
         const s = config.settings;
-        // Заполняем поля из памяти
         document.getElementById('tg-token').value = s.tgToken || '';
         document.getElementById('tg-chatid').value = s.tgChatId || '';
         document.getElementById('url-intro').value = s.urlIntro || '';
+        document.getElementById('btn-intro').value = s.btnIntro || '';
         document.getElementById('url-ambi').value = s.urlAmbi || '';
+        document.getElementById('btn-ambi').value = s.btnAmbi || '';
         document.getElementById('url-extra').value = s.urlExtra || '';
+        document.getElementById('btn-extra').value = s.btnExtra || '';
         document.getElementById('bg-color').value = s.bg || '#f9f9fb';
         document.getElementById('primary-color').value = s.primary || '#6c5ce7';
         document.getElementById('text-color').value = s.text || '#2d3436';
-        
         renderQuestions();
     }
 
@@ -104,60 +108,35 @@
             div.className = 'q-card';
             div.innerHTML = `
                 <button class="btn btn-del" onclick="deleteQ(${i})">Удалить</button>
-                <label>Вопрос №${i+1}</label>
                 <input type="text" value="${item.q}" oninput="updateQ(${i}, 'q', this.value)">
-                <div class="row">
-                    <input type="text" placeholder="Экстраверт" value="${item.a1}" oninput="updateQ(${i}, 'a1', this.value)">
-                    <input type="number" value="${item.v1}" oninput="updateQ(${i}, 'v1', this.value)" style="width:60px">
-                </div>
-                <div class="row">
-                    <input type="text" placeholder="Интроверт" value="${item.a2}" oninput="updateQ(${i}, 'a2', this.value)">
-                    <input type="number" value="${item.v2}" oninput="updateQ(${i}, 'v2', this.value)" style="width:60px">
-                </div>
-                <div class="row">
-                    <input type="text" placeholder="Амбиверт" value="${item.a3 || ''}" oninput="updateQ(${i}, 'a3', this.value)">
-                    <input type="number" value="${item.v3 || 1}" oninput="updateQ(${i}, 'v3', this.value)" style="width:60px">
-                </div>
+                <div class="row"><input type="text" value="${item.a1}" oninput="updateQ(${i}, 'a1', this.value)"><input type="number" value="${item.v1}" oninput="updateQ(${i}, 'v1', this.value)" style="width:60px"></div>
+                <div class="row"><input type="text" value="${item.a2}" oninput="updateQ(${i}, 'a2', this.value)"><input type="number" value="${item.v2}" oninput="updateQ(${i}, 'v2', this.value)" style="width:60px"></div>
             `;
             list.appendChild(div);
         });
     }
 
-    function updateQ(i, field, val) {
-        config.questions[i][field] = val;
-    }
-
-    function addQuestion() {
-        config.questions.push({ q: "Твой вопрос?", a1: "", v1: 2, a2: "", v2: 0, a3: "", v3: 1 });
-        renderQuestions();
-    }
-
-    function deleteQ(i) {
-        config.questions.splice(i, 1);
-        renderQuestions();
-    }
+    function updateQ(i, f, v) { config.questions[i][f] = v; }
+    function addQuestion() { config.questions.push({ q: "Новый вопрос", a1: "", v1: 2, a2: "", v2: 0 }); renderQuestions(); }
+    function deleteQ(i) { config.questions.splice(i, 1); renderQuestions(); }
 
     function saveAll() {
-        // Собираем настройки из инпутов
         config.settings = {
             tgToken: document.getElementById('tg-token').value.trim(),
             tgChatId: document.getElementById('tg-chatid').value.trim(),
             urlIntro: document.getElementById('url-intro').value.trim(),
+            btnIntro: document.getElementById('btn-intro').value.trim(),
             urlAmbi: document.getElementById('url-ambi').value.trim(),
+            btnAmbi: document.getElementById('btn-ambi').value.trim(),
             urlExtra: document.getElementById('url-extra').value.trim(),
+            btnExtra: document.getElementById('btn-extra').value.trim(),
             bg: document.getElementById('bg-color').value,
             primary: document.getElementById('primary-color').value,
             text: document.getElementById('text-color').value
         };
-
-        // Сохраняем в localStorage
         localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-        
-        console.log("Данные сохранены:", config);
-        alert('✅ Все настройки успешно сохранены!');
+        alert('✅ Настройки сохранены!');
     }
-
-    // Инициализация при загрузке
     window.onload = init;
 </script>
 </body>
